@@ -1,26 +1,33 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldCheck, Calculator as CalcIcon, FileSpreadsheet, Menu, X, ArrowRight, CheckCircle2, Zap, MousePointer2, Calendar, ArrowUpRight, ChevronDown, Download, Smartphone, List, Plus, Instagram } from 'lucide-react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Calculator as CalcIcon, FileSpreadsheet, Menu, X, ArrowRight, CheckCircle2, MousePointer2, Calendar, ArrowUpRight, ChevronDown, Download, Smartphone, List, Plus, Instagram } from 'lucide-react';
 import { Calculator } from './components/Calculator';
 import { DiagramGenerator } from './components/DiagramGenerator';
 import { Blog } from './components/Blog';
 import { WhoWeAre } from './components/WhoWeAre';
-import { ViewState, BlogPost } from './types';
+import { BlogPost } from './types';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { Contact } from './components/Contact';
 import { supabase } from './lib/supabaseClient';
 
 const App: React.FC = () => {
-  const [view, setView] = useState<ViewState>(ViewState.HOME);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  // Key to force re-render of Blog component to reset to list view
-  const [blogKey, setBlogKey] = useState(0);
-  const [selectedBlogPostId, setSelectedBlogPostId] = useState<number | null>(null);
   const [instagramUrl, setInstagramUrl] = useState<string>('#');
   const [latestPosts, setLatestPosts] = useState<BlogPost[]>([]);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Helper to check active route
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname === '/') return true;
+    if (path !== '/' && location.pathname.startsWith(path)) return true;
+    return false;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,26 +65,20 @@ const App: React.FC = () => {
   }, []);
 
   const openBlogPost = (id: number) => {
-    setSelectedBlogPostId(id);
-    setView(ViewState.BLOG);
-    setBlogKey(prev => prev + 1); // Garante que o Blog remonte com o novo ID
+    navigate(`/blog/${id}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const NavItem = ({ target, label, className = "" }: { target: ViewState, label: string, className?: string }) => (
+  const NavItem = ({ target, label, className = "" }: { target: string, label: string, className?: string }) => (
     <button
       onClick={() => {
-        if (target === ViewState.BLOG) {
-          setSelectedBlogPostId(null); // Reseta para mostrar a lista
-          setBlogKey(prev => prev + 1);
-        }
-        setView(target);
+        navigate(target);
         setMobileMenuOpen(false);
         setToolsOpen(false);
         setMobileToolsOpen(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }}
-      className={`font-medium transition-colors text-left ${view === target ? 'text-electric-yellow' : 'text-text-secondary hover:text-text-primary'} ${className ? className : 'text-base'}`}
+      className={`font-medium transition-colors text-left ${isActive(target) ? 'text-electric-yellow' : 'text-text-secondary hover:text-text-primary'} ${className ? className : 'text-base'}`}
     >
       {label}
     </button>
@@ -269,9 +270,7 @@ const App: React.FC = () => {
           </div>
           <button
             onClick={() => {
-              setSelectedBlogPostId(null);
-              setBlogKey(prev => prev + 1);
-              setView(ViewState.BLOG);
+              navigate('/blog');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="text-sm text-electric-yellow hover:underline flex items-center gap-1"
@@ -380,7 +379,7 @@ const App: React.FC = () => {
 
           <div className="pt-8 w-full flex justify-center pb-2 max-w-md mx-auto">
             <button
-              onClick={() => setView(ViewState.CALCULATOR)}
+              onClick={() => navigate('/calculator')}
               className="inline-flex items-center gap-2 bg-electric-yellow text-black font-semibold px-6 py-3 rounded-lg hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20 w-full justify-center"
             >
               <CalcIcon className="w-4 h-4" />
@@ -403,7 +402,7 @@ const App: React.FC = () => {
 
           <div className="pt-8 w-full flex justify-center pb-2 max-w-md mx-auto">
             <button
-              onClick={() => setView(ViewState.DIAGRAM_GENERATOR)}
+              onClick={() => navigate('/diagram-generator')}
               className="inline-flex items-center gap-2 bg-zinc-900 text-white font-semibold px-6 py-3 rounded-lg hover:bg-zinc-700 transition-colors shadow-lg shadow-zinc-500/20 w-full justify-center"
             >
               <FileSpreadsheet className="w-4 h-4 text-electric-yellow" />
@@ -489,7 +488,7 @@ const App: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <button
-            onClick={() => setView(ViewState.CALCULATOR)}
+            onClick={() => navigate('/calculator')}
             className="group bg-white text-black font-medium px-6 py-3 rounded-lg hover:bg-zinc-200 transition-all flex items-center gap-2"
           >
             <CalcIcon className="w-4 h-4" />
@@ -497,7 +496,7 @@ const App: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setView(ViewState.DIAGRAM_GENERATOR)}
+            onClick={() => navigate('/diagram-generator')}
             className="group text-text-secondary hover:text-white font-medium px-6 py-3 flex items-center gap-2 transition-colors"
           >
             Dimensionador QDC <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -512,10 +511,10 @@ const App: React.FC = () => {
       <div className="fixed inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none z-0"></div>
 
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-dark-bg/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center relative">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
           <div
             className="flex items-center gap-3 cursor-pointer group shrink-0"
-            onClick={() => { setView(ViewState.HOME); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            onClick={() => { navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           >
             {/* New Logo Implementation */}
             <div className="w-9 h-9 rounded-md shadow-[0_0_15px_rgba(250,204,21,0.3)] overflow-hidden shrink-0">
@@ -536,42 +535,42 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-            <NavItem target={ViewState.HOME} label="Início" />
+          <div className="flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-8">
+              <NavItem target="/" label="Início" />
 
-            {/* Ferramentas Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setToolsOpen(!toolsOpen)}
-                className={`text-base font-medium transition-colors flex items-center gap-1 ${[ViewState.CALCULATOR, ViewState.DIAGRAM_GENERATOR, ViewState.DOWNLOAD_APP].includes(view) ? 'text-electric-yellow' : 'text-text-secondary hover:text-text-primary'}`}
-              >
-                Ferramentas <ChevronDown className={`w-4 h-4 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
-              </button>
+              {/* Ferramentas Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setToolsOpen(!toolsOpen)}
+                  className={`text-base font-medium transition-colors flex items-center gap-1 ${['/calculator', '/diagram-generator', '/download-app'].some(path => location.pathname.startsWith(path)) ? 'text-electric-yellow' : 'text-text-secondary hover:text-text-primary'}`}
+                >
+                  Ferramentas <ChevronDown className={`w-4 h-4 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
+                </button>
 
-              {toolsOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-dark-surface border border-dark-border rounded-xl shadow-2xl py-2 animate-fade-in overflow-hidden">
-                  <button onClick={() => { setView(ViewState.CALCULATOR); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
-                    <CalcIcon className="w-4 h-4 text-electric-yellow" /> Calculadora
-                  </button>
-                  <button onClick={() => { setView(ViewState.DIAGRAM_GENERATOR); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
-                    <FileSpreadsheet className="w-4 h-4 text-electric-yellow" /> Dimensionador QDC
-                  </button>
-                  <div className="h-[1px] bg-dark-border my-1 mx-2"></div>
-                  <button onClick={() => { setView(ViewState.DOWNLOAD_APP); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
-                    <Smartphone className="w-4 h-4 text-electric-yellow" /> Baixar App Android
-                  </button>
-                </div>
-              )}
-            </div>
+                {toolsOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-56 bg-dark-surface border border-dark-border rounded-xl shadow-2xl py-2 animate-fade-in overflow-hidden">
+                    <button onClick={() => { navigate('/calculator'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
+                      <CalcIcon className="w-4 h-4 text-electric-yellow" /> Calculadora
+                    </button>
+                    <button onClick={() => { navigate('/diagram-generator'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
+                      <FileSpreadsheet className="w-4 h-4 text-electric-yellow" /> Dimensionador QDC
+                    </button>
+                    <div className="h-[1px] bg-dark-border my-1 mx-2"></div>
+                    <button onClick={() => { navigate('/download-app'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
+                      <Smartphone className="w-4 h-4 text-electric-yellow" /> Baixar App Android
+                    </button>
+                  </div>
+                )}
+              </div>
 
-            <NavItem target={ViewState.BLOG} label="Artigos" />
-            <NavItem target={ViewState.WHO_WE_ARE} label="Quem Somos" />
-            <NavItem target={ViewState.CONTACT} label="Contato" />
-          </nav>
+              <NavItem target="/blog" label="Artigos" />
+              <NavItem target="/who-we-are" label="Quem Somos" />
+              <NavItem target="/contact" label="Contato" />
+            </nav>
 
-          <div className="flex items-center gap-4">
-            {/* Instagram Icon - Placeholder for DB Link */}
-            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-electric-yellow transition-colors">
+            {/* Instagram Icon */}
+            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="hidden lg:block text-text-secondary hover:text-electric-yellow transition-colors">
               <Instagram className="w-5 h-5" />
             </a>
 
@@ -585,12 +584,12 @@ const App: React.FC = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-dark-bg border-b border-dark-border p-6 space-y-6 absolute w-full shadow-2xl overflow-y-auto max-h-[90vh] animate-fade-in z-[60]">
             <div className="flex flex-col gap-6">
-              <NavItem target={ViewState.HOME} label="Início" className="text-lg" />
+              <NavItem target="/" label="Início" className="text-lg" />
 
               <div className="flex flex-col gap-4">
                 <button
                   onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
-                  className={`text-lg font-medium transition-colors flex items-center justify-between ${[ViewState.CALCULATOR, ViewState.DIAGRAM_GENERATOR, ViewState.DOWNLOAD_APP].includes(view) ? 'text-electric-yellow' : 'text-text-secondary hover:text-text-primary'}`}
+                  className={`text-lg font-medium transition-colors flex items-center justify-between ${['/calculator', '/diagram-generator', '/download-app'].some(path => location.pathname.startsWith(path)) ? 'text-electric-yellow' : 'text-text-secondary hover:text-text-primary'}`}
                 >
                   Ferramentas <ChevronDown className={`w-5 h-5 transition-transform ${mobileToolsOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -598,19 +597,19 @@ const App: React.FC = () => {
                 {mobileToolsOpen && (
                   <div className="pl-4 border-l-2 border-electric-yellow/30 flex flex-col gap-5 py-2 animate-fade-in">
                     <button
-                      onClick={() => { setView(ViewState.CALCULATOR); setMobileMenuOpen(false); }}
+                      onClick={() => { navigate('/calculator'); setMobileMenuOpen(false); }}
                       className="text-white text-base font-medium flex items-center gap-3"
                     >
                       <CalcIcon className="w-5 h-5 text-electric-yellow" /> Calculadora
                     </button>
                     <button
-                      onClick={() => { setView(ViewState.DIAGRAM_GENERATOR); setMobileMenuOpen(false); }}
+                      onClick={() => { navigate('/diagram-generator'); setMobileMenuOpen(false); }}
                       className="text-white text-base font-medium flex items-center gap-3"
                     >
                       <FileSpreadsheet className="w-5 h-5 text-electric-yellow" /> Dimensionador QDC
                     </button>
                     <button
-                      onClick={() => { setView(ViewState.DOWNLOAD_APP); setMobileMenuOpen(false); }}
+                      onClick={() => { navigate('/download-app'); setMobileMenuOpen(false); }}
                       className="text-white text-base font-medium flex items-center gap-3"
                     >
                       <Smartphone className="w-5 h-5 text-electric-yellow" /> Baixar App Android
@@ -619,39 +618,42 @@ const App: React.FC = () => {
                 )}
               </div>
 
-              <NavItem target={ViewState.BLOG} label="Artigos" className="text-lg" />
-              <NavItem target={ViewState.WHO_WE_ARE} label="Quem Somos" className="text-lg" />
-              <NavItem target={ViewState.CONTACT} label="Contato" className="text-lg" />
+              <NavItem target="/blog" label="Artigos" className="text-lg" />
+              <NavItem target="/who-we-are" label="Quem Somos" className="text-lg" />
+              <NavItem target="/contact" label="Contato" className="text-lg" />
             </div>
           </div>
         )}
       </header>
 
       <main className="flex-grow pt-20 relative z-10">
-        {view === ViewState.HOME && (
-          <>
-            <Hero />
-            <HowToSection />
-            <HowToQDCSection />
-            <LatestArticlesSection />
-          </>
-        )}
-        {view === ViewState.CALCULATOR && <Calculator />}
-        {view === ViewState.DIAGRAM_GENERATOR && <DiagramGenerator />}
-        {view === ViewState.BLOG && <Blog key={blogKey} initialPostId={selectedBlogPostId} />}
-        {view === ViewState.WHO_WE_ARE && <WhoWeAre />}
-        {view === ViewState.CONTACT && <Contact />}
-        {view === ViewState.DOWNLOAD_APP && (
-          <div className="max-w-4xl mx-auto p-12 text-center flex flex-col items-center justify-center animate-fade-in min-h-[60vh]">
-            <Smartphone className="w-20 h-20 text-electric-yellow mb-6" />
-            <h2 className="text-3xl font-bold text-white mb-4">Instalação Segura Mobile</h2>
-            <p className="text-text-secondary mb-8 max-w-md">Em breve, nossa Calculadora e Dimensionador juntamente com outras ferramentas profissionais estarão disponíveis nativamente na versão Android.</p>
-            <button className="bg-white text-black font-bold px-8 py-4 rounded-xl flex items-center gap-3 hover:bg-zinc-200 transition-all opacity-50 cursor-not-allowed">
-              <Download className="w-5 h-5" /> Google Play (Em breve)
-            </button>
-          </div>
-        )}
-        {view === ViewState.PRIVACY_POLICY && <PrivacyPolicy onBack={() => { setView(ViewState.HOME); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />}
+        <Routes>
+          <Route path="/" element={
+            <>
+              <Hero />
+              <HowToSection />
+              <HowToQDCSection />
+              <LatestArticlesSection />
+            </>
+          } />
+          <Route path="/calculator" element={<Calculator />} />
+          <Route path="/diagram-generator" element={<DiagramGenerator />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<Blog />} />
+          <Route path="/who-we-are" element={<WhoWeAre />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/download-app" element={
+            <div className="max-w-4xl mx-auto p-12 text-center flex flex-col items-center justify-center animate-fade-in min-h-[60vh]">
+              <Smartphone className="w-20 h-20 text-electric-yellow mb-6" />
+              <h2 className="text-3xl font-bold text-white mb-4">Instalação Segura Mobile</h2>
+              <p className="text-text-secondary mb-8 max-w-md">Em breve, nossa Calculadora e Dimensionador juntamente com outras ferramentas profissionais estarão disponíveis nativamente na versão Android.</p>
+              <button className="bg-white text-black font-bold px-8 py-4 rounded-xl flex items-center gap-3 hover:bg-zinc-200 transition-all opacity-50 cursor-not-allowed">
+                <Download className="w-5 h-5" /> Google Play (Em breve)
+              </button>
+            </div>
+          } />
+          <Route path="/privacy-policy" element={<PrivacyPolicy onBack={() => { navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />} />
+        </Routes>
       </main>
 
       <footer className="border-t border-dark-border py-12 px-6 mt-auto bg-dark-bg relative z-10">
@@ -667,13 +669,13 @@ const App: React.FC = () => {
           <div className="flex gap-6 text-sm text-text-secondary">
             <span
               className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => { setView(ViewState.PRIVACY_POLICY); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onClick={() => { navigate('/privacy-policy'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
               Termos e Privacidade
             </span>
             <span
               className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => { setView(ViewState.CONTACT); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
               Contato
             </span>

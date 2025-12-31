@@ -1,15 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowUpRight, ArrowLeft, Tag, Calendar, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './Button';
 import { supabase } from '../lib/supabaseClient';
 import { BlogPost } from '../types';
 
-interface BlogProps {
-  initialPostId?: number | null;
-}
-
-export const Blog: React.FC<BlogProps> = ({ initialPostId }) => {
+export const Blog: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,15 +23,15 @@ export const Blog: React.FC<BlogProps> = ({ initialPostId }) => {
 
       if (data) {
         setPosts(data);
-        if (initialPostId) {
-          const found = data.find((p: BlogPost) => p.id === initialPostId);
+        if (id) {
+          const found = data.find((p: BlogPost) => p.id === parseInt(id));
           if (found) setSelectedPost(found);
         }
       }
       setLoading(false);
     };
     fetchPosts();
-  }, [initialPostId]);
+  }, [id]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -57,12 +56,12 @@ export const Blog: React.FC<BlogProps> = ({ initialPostId }) => {
   // Scroll to top when opening a post
   const openPost = (post: BlogPost) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setSelectedPost(post);
+    navigate(`/blog/${post.id}`);
   };
 
   const closePost = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setSelectedPost(null);
+    navigate('/blog');
   };
 
   if (loading && posts.length === 0) {

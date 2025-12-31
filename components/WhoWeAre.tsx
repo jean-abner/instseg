@@ -4,19 +4,22 @@ import { supabase } from '../lib/supabaseClient';
 import { Target, Users, ShieldCheck, Zap } from 'lucide-react';
 
 export const WhoWeAre: React.FC = () => {
-  const [imageUrl, setImageUrl] = useState<string>('https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2070&auto=format&fit=crop');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchImage = async () => {
+      setLoading(true);
       const { data } = await supabase
         .from('about_page_assets')
         .select('image_url')
         .eq('asset_key', 'who_we_are_main')
         .single();
 
-      if (data) {
+      if (data && data.image_url) {
         setImageUrl(data.image_url);
       }
+      setLoading(false);
     };
     fetchImage();
   }, []);
@@ -41,12 +44,22 @@ export const WhoWeAre: React.FC = () => {
           </p>
         </div>
         <div className="relative">
-          <div className="aspect-video rounded-2xl overflow-hidden border border-dark-border shadow-2xl">
-            <img
-              src={imageUrl}
-              alt="Engenharia Elétrica"
-              className="w-full h-full object-cover"
-            />
+          <div className="aspect-video rounded-2xl overflow-hidden border border-dark-border shadow-2xl bg-dark-surface">
+            {loading ? (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-electric-yellow border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="Engenharia Elétrica"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-text-secondary">
+                <p>Imagem não disponível</p>
+              </div>
+            )}
           </div>
           <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-electric-yellow/10 blur-3xl rounded-full"></div>
         </div>
