@@ -10,6 +10,7 @@ import { BlogPost } from './types';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { Contact } from './components/Contact';
 import { supabase } from './lib/supabaseClient';
+import { Analytics } from "@vercel/analytics/react"
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -682,6 +683,7 @@ const App: React.FC = () => {
           </div>
         </div>
       </footer>
+      <Analytics />
     </div>
   );
 };
