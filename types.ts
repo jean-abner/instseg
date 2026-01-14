@@ -33,6 +33,8 @@ export interface BlogPost {
   title: string;
   excerpt: string;
   tag: string;
+  tags2?: string; // Comma-separated tags for the article view
+  tags?: string[]; // Array of tags for the post
   display_date: string;
   image_url: string;
   content: string; // HTML content

@@ -6,6 +6,7 @@ import { Button } from './Button';
 import { supabase } from '../lib/supabaseClient';
 import { BlogPost } from '../types';
 
+
 export const Blog: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ export const Blog: React.FC = () => {
         if (id) {
           const found = data.find((p: BlogPost) => p.id === parseInt(id));
           if (found) setSelectedPost(found);
+        } else {
+          setSelectedPost(null);
         }
       }
       setLoading(false);
@@ -64,118 +67,153 @@ export const Blog: React.FC = () => {
     navigate('/blog');
   };
 
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selectedPost && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [selectedPost]);
+
   if (loading && posts.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto p-6 flex justify-center py-20">
+      <div className="max-w-5xl mx-auto p-6 flex justify-center py-20">
         <div className="w-10 h-10 border-4 border-electric-yellow border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
+  const DEFAULT_POST_IMAGE = 'https://images.unsplash.com/photo-1621905251189-fc015acafd31?q=80&w=2070&auto=format&fit=crop';
+
   if (selectedPost) {
     return (
-      <div className="max-w-5xl mx-auto p-4 md:p-6 animate-fade-in pb-20">
-        <Button
-          onClick={closePost}
-          variant="ghost"
-          className="mb-6 pl-0 hover:pl-2 transition-all gap-2 text-zinc-400 hover:text-electric-yellow"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar para Artigos
-        </Button>
+      <div className="bg-white text-zinc-900 animate-fade-in min-h-screen flex flex-col">
+        <div className="w-full">
+          {/* Back Button */}
 
-        <article>
-          {/* Header Image */}
-          <div className="relative w-full h-[300px] md:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-dark-border">
-            <img
-              src={selectedPost.image_url}
-              alt={selectedPost.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
-            <div className="absolute bottom-0 left-0 p-6 md:p-10 pb-24 md:pb-28 w-full">
-              <div className="flex flex-wrap items-center gap-4 mb-4">
-                <span className="bg-electric-yellow text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-yellow-500/20">
-                  {selectedPost.tag}
-                </span>
-                <span className="flex items-center gap-1.5 text-zinc-200 text-xs font-medium bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                  <Calendar className="w-3.5 h-3.5" /> {selectedPost.display_date}
-                </span>
-              </div>
-              <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight drop-shadow-lg max-w-4xl">
-                {selectedPost.title}
-              </h1>
-            </div>
-          </div>
-
-          {/* White Paper Content Body */}
-          <div className="relative z-10 -mt-20 mx-2 md:mx-6 bg-white rounded-3xl shadow-xl p-8 md:p-12 text-zinc-900">
-            {/* Author Info */}
-            <div className="flex items-center gap-4 mb-10 pb-8 border-b border-zinc-200">
-              <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200 overflow-hidden">
-                {selectedPost.editor_avatar_url ? (
-                  <img src={selectedPost.editor_avatar_url} alt="Editor" className="w-full h-full object-cover" />
+          <article className="px-4 max-w-4xl mx-auto pb-32 pt-12">
+            {/* Tag Section */}
+            {(selectedPost.tags2 || selectedPost.tag) && (
+              <div className="flex flex-wrap justify-center gap-3 mb-6">
+                {selectedPost.tags2 ? (
+                  selectedPost.tags2.split(',').map((tag, index) => (
+                    <span key={index} className="bg-electric-yellow text-black text-xs font-bold px-4 py-2 uppercase tracking-wider rounded-[10px]">
+                      {tag.trim()}
+                    </span>
+                  ))
                 ) : (
-                  <User className="w-6 h-6 text-zinc-700" />
+                  <span className="bg-electric-yellow text-black text-xs font-bold px-4 py-2 uppercase tracking-wider rounded-[10px]">
+                    {selectedPost.tag}
+                  </span>
                 )}
               </div>
-              <div>
-                <p className="text-sm font-bold text-zinc-900">{selectedPost.editor_name || 'Equipe Instalação Segura'}</p>
+            )}
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-zinc-900 text-center leading-tight mb-6">
+              {selectedPost.title}
+            </h1>
+
+            {/* Metadata */}
+            <div className="flex justify-center items-center gap-6 mb-10 text-sm border-b border-zinc-200 pb-10">
+              <div className="flex items-center gap-2 text-zinc-600">
+                <User className="w-4 h-4 text-yellow-600" />
+                <span className="font-semibold">{selectedPost.editor_name || 'Instalação Segura'}</span>
+              </div>
+              <span className="text-zinc-300">•</span>
+              <div className="flex items-center gap-2 text-zinc-600">
+                <Calendar className="w-4 h-4 text-yellow-600" />
+                <span>{selectedPost.display_date}</span>
               </div>
             </div>
 
-            {/* Injected HTML Content - Typography Optimized for Light Background */}
-            <div
-              className="prose prose-lg max-w-none prose-zinc 
-              prose-headings:font-bold prose-headings:text-zinc-900 
-              prose-p:text-zinc-700 prose-p:leading-relaxed
-              prose-li:text-zinc-700 prose-li:marker:text-yellow-500
-              prose-strong:text-yellow-600 prose-strong:font-bold
-              prose-a:text-blue-600 hover:prose-a:text-blue-800"
-              dangerouslySetInnerHTML={{ __html: selectedPost.content }}
-            />
-
-            {/* Footer Tag */}
-            <div className="mt-12 pt-8 border-t border-zinc-200 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-yellow-600" />
-              <span className="text-sm text-zinc-500 font-medium">Tags: {selectedPost.tag}, NBR 5410</span>
+            {/* Featured Image - Full Size, No Crop */}
+            <div className="w-full mb-12 shadow-xl rounded-2xl overflow-hidden bg-zinc-100">
+              <img
+                src={selectedPost.image_url || DEFAULT_POST_IMAGE}
+                alt={selectedPost.title}
+                className="w-full h-auto shadow-sm"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = DEFAULT_POST_IMAGE;
+                }}
+              />
             </div>
-          </div>
 
-          {/* Related Posts Section - Outside the white box to keep dark contrast */}
-          <div className="mt-16 pt-8 px-2 md:px-4">
-            <h3 className="text-xl font-bold text-white mb-8 flex items-center gap-3">
-              <div className="w-1.5 h-6 bg-electric-yellow rounded-full"></div>
-              Continue Lendo
-            </h3>
-            <div className="grid md:grid-cols-2 gap-6">
-              {posts.filter(p => p.id !== selectedPost.id).slice(0, 2).map(post => (
-                <div
-                  key={post.id}
-                  onClick={() => openPost(post)}
-                  className="group cursor-pointer bg-dark-surface border border-dark-border rounded-xl p-5 flex gap-5 hover:border-electric-yellow/30 hover:bg-zinc-800/50 transition-all shadow-lg"
+            {/* Content Body - Light Background, Dark Text */}
+            <div className="w-full">
+              {/* Article Content with Light Theme Typography */}
+              <div
+                className="prose prose-lg max-w-none prose-zinc
+                prose-headings:font-bold prose-headings:text-zinc-900 prose-headings:mt-12 prose-headings:mb-6
+                prose-p:text-zinc-800 prose-p:leading-relaxed prose-p:mb-6
+                prose-li:text-zinc-800 prose-li:marker:text-yellow-600
+                prose-strong:text-yellow-700 prose-strong:font-bold
+                prose-a:text-yellow-700 hover:prose-a:text-yellow-800
+                prose-ul:my-6 prose-ol:my-6
+                prose-img:rounded-xl prose-img:my-8 prose-img:shadow-lg"
+                dangerouslySetInnerHTML={{ __html: selectedPost.content }}
+              />
+
+              {/* Footer Tag */}
+              <div className="mt-16 pt-8 border-t border-zinc-200 flex items-center gap-2">
+                <Tag className="w-4 h-4 text-yellow-600" />
+                <span className="text-sm text-zinc-500 font-medium">Tags: {selectedPost.tag}, NBR 5410</span>
+              </div>
+            </div>
+
+            {/* Related Posts Section (Darker contrast section) */}
+            <div className="mt-20 pt-16 border-t border-zinc-200">
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-2xl font-bold text-zinc-900 flex items-center gap-3">
+                  <div className="w-1.5 h-8 bg-electric-yellow rounded-full"></div>
+                  Continue Lendo
+                </h3>
+                <Button
+                  onClick={closePost}
+                  variant="ghost"
+                  className="pl-0 hover:pl-2 transition-all gap-2 text-zinc-900 font-bold hover:text-black hover:bg-zinc-100"
                 >
-                  <div className="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-zinc-800 border border-zinc-700">
-                    <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <ArrowLeft className="w-5 h-5 text-electric-yellow" /> Voltar para Artigos
+                </Button>
+              </div>
+              <div className="grid md:grid-cols-2 gap-8">
+                {posts.filter(p => p.id !== selectedPost.id).slice(0, 2).map(post => (
+                  <div
+                    key={post.id}
+                    onClick={() => openPost(post)}
+                    className="group cursor-pointer bg-white border border-zinc-200 rounded-xl p-5 flex gap-5 hover:border-yellow-400 hover:shadow-xl transition-all"
+                  >
+                    <div className="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-zinc-100 border border-zinc-200">
+                      <img
+                        src={post.image_url || DEFAULT_POST_IMAGE}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = DEFAULT_POST_IMAGE;
+                        }}
+                      />
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2 group-hover:text-yellow-600 transition-colors">{post.tag}</span>
+                      <h4 className="text-base font-bold text-zinc-900 leading-tight mb-2 line-clamp-2">
+                        {post.title}
+                      </h4>
+                    </div>
                   </div>
-                  <div className="flex flex-col justify-center">
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2 group-hover:text-electric-yellow transition-colors">{post.tag}</span>
-                    <h4 className="text-base font-bold text-zinc-100 group-hover:text-white leading-tight mb-2 line-clamp-2">
-                      {post.title}
-                    </h4>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </article>
-      </div>
+          </article>
+
+        </div>
+      </div >
     );
   }
 
   // LIST VIEW
   return (
-    <div className="max-w-7xl mx-auto p-6 animate-fade-in pb-20">
+    <div className="max-w-5xl mx-auto p-6 animate-fade-in pb-20">
 
       {/* Centered Header */}
       <div className="text-center mb-16 max-w-3xl mx-auto">
@@ -192,11 +230,14 @@ export const Blog: React.FC = () => {
             className="group flex flex-col bg-dark-surface border border-dark-border rounded-2xl overflow-hidden hover:border-zinc-700 hover:shadow-2xl hover:shadow-electric-yellow/5 transition-all cursor-pointer h-full"
           >
             {/* Image Container */}
-            <div className="h-56 relative overflow-hidden">
+            <div className="h-44 relative overflow-hidden bg-zinc-800">
               <img
-                src={post.image_url}
+                src={post.image_url || DEFAULT_POST_IMAGE}
                 alt={post.title}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = DEFAULT_POST_IMAGE;
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-dark-surface to-transparent opacity-60"></div>
 
@@ -218,7 +259,7 @@ export const Blog: React.FC = () => {
                 {post.title}
               </h3>
 
-              <p className="text-text-secondary text-sm leading-relaxed mb-6 line-clamp-3 flex-1">
+              <p className="text-text-secondary text-sm leading-relaxed mb-6 line-clamp-2 flex-1">
                 {post.excerpt}
               </p>
 
@@ -240,7 +281,7 @@ export const Blog: React.FC = () => {
             variant="outline"
             onClick={prevPage}
             disabled={currentPage === 1}
-            className="w-10 h-10 p-0 rounded-full"
+            className="w-10 h-10 p-0 rounded-full text-white border-zinc-700"
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
@@ -253,7 +294,7 @@ export const Blog: React.FC = () => {
             variant="outline"
             onClick={nextPage}
             disabled={currentPage === totalPages}
-            className="w-10 h-10 p-0 rounded-full"
+            className="w-10 h-10 p-0 rounded-full text-white border-zinc-700"
           >
             <ChevronRight className="w-5 h-5" />
           </Button>

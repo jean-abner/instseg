@@ -11,6 +11,7 @@ import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { Contact } from './components/Contact';
 import { supabase } from './lib/supabaseClient';
 import { Analytics } from "@vercel/analytics/react"
+import { Footer } from './components/Footer';
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -263,7 +264,7 @@ const App: React.FC = () => {
 
   const LatestArticlesSection = () => (
     <div className="py-20 px-6 bg-dark-bg border-t border-dark-border">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-end mb-12">
           <div>
             <h2 className="text-3xl font-bold text-white mb-2">Últimos Artigos</h2>
@@ -287,7 +288,7 @@ const App: React.FC = () => {
               onClick={() => openBlogPost(post.id)}
               className="group bg-dark-surface border border-dark-border rounded-xl overflow-hidden cursor-pointer hover:border-zinc-700 hover:shadow-xl transition-all flex flex-col h-full"
             >
-              <div className="h-48 overflow-hidden relative">
+              <div className="h-40 overflow-hidden relative">
                 <img
                   src={post.image_url}
                   alt={post.title}
@@ -305,7 +306,7 @@ const App: React.FC = () => {
                 <h3 className="text-lg font-bold text-white mb-2 group-hover:text-electric-yellow transition-colors leading-tight">
                   {post.title}
                 </h3>
-                <p className="text-sm text-zinc-400 line-clamp-3 mb-4 flex-1">
+                <p className="text-sm text-zinc-400 line-clamp-2 mb-4 flex-1">
                   {post.excerpt}
                 </p>
                 <div className="flex items-center text-xs font-medium text-electric-yellow gap-1 mt-auto">
@@ -321,7 +322,7 @@ const App: React.FC = () => {
 
   const HowToSection = () => (
     <div className="py-20 px-6 border-t border-zinc-200 bg-ice-white">
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-stretch">
+      <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-16 items-stretch">
         <div className="flex flex-col">
           <h2 className="text-3xl font-bold text-zinc-900 mb-6 text-center lg:text-left">
             Calculadora Elétrica <span className="text-yellow-600">Inteligente</span> e Segura
@@ -394,7 +395,7 @@ const App: React.FC = () => {
 
   const HowToQDCSection = () => (
     <div className="py-20 px-6 border-t border-zinc-200 bg-white">
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
         {/* Animation on Left */}
         <div className="relative flex flex-col justify-between items-center h-full order-2 lg:order-1">
           <div className="w-full">
@@ -512,13 +513,13 @@ const App: React.FC = () => {
       <div className="fixed inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none z-0"></div>
 
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-dark-bg/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex justify-between items-center">
+          {/* ... header content ... */}
           <div
             className="flex items-center gap-3 cursor-pointer group shrink-0"
             onClick={() => { navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           >
-            {/* New Logo Implementation */}
-            <div className="w-9 h-9 rounded-md shadow-[0_0_15px_rgba(250,204,21,0.3)] overflow-hidden shrink-0">
+            <div className="w-8 h-8 rounded-md shadow-[0_0_15px_rgba(250,204,21,0.3)] overflow-hidden shrink-0">
               <svg viewBox="0 0 512 512" className="w-full h-full">
                 <rect width="512" height="512" fill="#FACC15" />
                 <path d="M256 80L410 140V240C410 350 340 440 256 470C172 440 102 350 102 240V140L256 80Z" fill="none" stroke="black" strokeWidth="35" strokeLinecap="round" strokeLinejoin="round" />
@@ -527,11 +528,8 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex flex-col justify-center">
-              <span className="font-display font-bold text-[16px] tracking-wider leading-none">
+              <span className="font-display font-bold text-[14px] tracking-wider leading-none">
                 <span className="text-white">INSTALAÇÃO</span><span className="text-electric-yellow">SEGURA</span>
-              </span>
-              <span className="hidden sm:block text-[7px] text-zinc-400 font-sans tracking-widest uppercase leading-tight mt-0.5">
-                Cálculo certo, para sua instalação segura
               </span>
             </div>
           </div>
@@ -627,7 +625,7 @@ const App: React.FC = () => {
         )}
       </header>
 
-      <main className="flex-grow pt-20 relative z-10">
+      <main className="flex-grow pt-16 relative z-10">
         <Routes>
           <Route path="/" element={
             <>
@@ -657,32 +655,7 @@ const App: React.FC = () => {
         </Routes>
       </main>
 
-      <footer className="border-t border-dark-border py-12 px-6 mt-auto bg-dark-bg relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="font-display text-sm font-semibold text-text-secondary">
-              INSTALAÇÃO<span className="text-electric-yellow">SEGURA</span>
-            </span>
-            <span className="text-dark-border">|</span>
-            <span className="text-xs text-text-secondary">© 2025</span>
-          </div>
-
-          <div className="flex gap-6 text-sm text-text-secondary">
-            <span
-              className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => { navigate('/privacy-policy'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            >
-              Termos e Privacidade
-            </span>
-            <span
-              className="cursor-pointer hover:text-white transition-colors"
-              onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            >
-              Contato
-            </span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
       <Analytics />
     </div>
   );
