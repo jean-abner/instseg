@@ -8,7 +8,7 @@ import { BlogPost } from '../types';
 
 
 export const Blog: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -24,8 +24,8 @@ export const Blog: React.FC = () => {
 
       if (data) {
         setPosts(data);
-        if (id) {
-          const found = data.find((p: BlogPost) => p.id === parseInt(id));
+        if (slug) {
+          const found = data.find((p: BlogPost) => p.slug === slug || p.id.toString() === slug);
           if (found) setSelectedPost(found);
         } else {
           setSelectedPost(null);
@@ -34,7 +34,7 @@ export const Blog: React.FC = () => {
       setLoading(false);
     };
     fetchPosts();
-  }, [id]);
+  }, [slug]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -59,7 +59,8 @@ export const Blog: React.FC = () => {
   // Scroll to top when opening a post
   const openPost = (post: BlogPost) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    navigate(`/blog/${post.id}`);
+    const urlSlug = post.slug || post.id;
+    navigate(`/${urlSlug}`);
   };
 
   const closePost = () => {

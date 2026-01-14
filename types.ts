@@ -30,6 +30,7 @@ export interface CalculationResult {
 
 export interface BlogPost {
   id: number;
+  slug?: string;
   title: string;
   excerpt: string;
   tag: string;

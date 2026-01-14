@@ -66,8 +66,9 @@ const App: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const openBlogPost = (id: number) => {
-    navigate(`/blog/${id}`);
+  const openBlogPost = (post: BlogPost) => {
+    const slug = post.slug || post.id;
+    navigate(`/${slug}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -285,7 +286,7 @@ const App: React.FC = () => {
           {latestPosts.map((post) => (
             <div
               key={post.id}
-              onClick={() => openBlogPost(post.id)}
+              onClick={() => openBlogPost(post)}
               className="group bg-dark-surface border border-dark-border rounded-xl overflow-hidden cursor-pointer hover:border-zinc-700 hover:shadow-xl transition-all flex flex-col h-full"
             >
               <div className="h-40 overflow-hidden relative">
@@ -321,21 +322,18 @@ const App: React.FC = () => {
   );
 
   const HowToSection = () => (
-    <div className="py-20 px-6 border-t border-zinc-200 bg-ice-white">
-      <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-16 items-stretch">
+    <div className="pt-10 pb-16 px-6 border-t border-zinc-200 bg-ice-white">
+      <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
         <div className="flex flex-col">
-          <h2 className="text-3xl font-bold text-zinc-900 mb-6 text-center lg:text-left">
+          <h2 className="text-3xl font-bold text-zinc-900 mb-4 text-center lg:text-left">
             Calculadora Elétrica <span className="text-yellow-600">Inteligente</span> e Segura
           </h2>
 
-          <p className="text-zinc-600 leading-relaxed mb-8 text-lg text-center lg:text-left">
-            Em dúvida sobre qual <strong className="text-zinc-900">bitola de fio</strong>, <strong className="text-zinc-900">disjuntor</strong> ou materiais elétricos utilizar?
-            Com a Calculadora Elétrica da Instalação Segura, o dimensionamento elétrico ficou fácil.
-            Insira os dados do seu equipamento e rapidamente obtenha a indicação correta dos materiais para utilizar,
-            evitando riscos de incêndio e desperdício de energia.
+          <p className="text-zinc-600 leading-relaxed mb-6 text-[15px] text-center lg:text-left">
+            Em dúvida sobre qual <strong className="text-zinc-900">fio</strong> ou <strong className="text-zinc-900">disjuntor</strong> utilizar? Com a <strong className="text-zinc-900">Calculadora Elétrica</strong> do <strong className="text-zinc-900">Instalação Segura</strong>, o dimensionamento elétrico ficou fácil. Insira os dados do seu equipamento e rapidamente obtenha a indicação correta dos materiais para utilizar na sua instalação, evitando riscos de incêndio e desperdício de energia.
           </p>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-2">
               <span className="w-8 h-[1px] bg-yellow-500"></span>
               Como usar a ferramenta
@@ -360,13 +358,13 @@ const App: React.FC = () => {
                   desc: "Nosso sistema calcula automaticamente a bitola do fio, o disjuntor correto, a queda de tensão e lista os materiais necessários."
                 }
               ].map((step, idx) => (
-                <li key={idx} className="flex gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-electric-yellow font-bold text-sm shadow-md">
+                <li key={idx} className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-electric-yellow font-bold text-xs shadow-md">
                     {idx + 1}
                   </div>
                   <div>
-                    <h4 className="text-zinc-900 font-medium text-sm">{step.title}</h4>
-                    <p className="text-zinc-600 text-sm leading-snug mt-1">{step.desc}</p>
+                    <h4 className="text-zinc-900 font-medium text-[15px]">{step.title}</h4>
+                    <p className="text-zinc-600 text-[13px] leading-snug">{step.desc}</p>
                   </div>
                 </li>
               ))}
@@ -379,7 +377,7 @@ const App: React.FC = () => {
             <DemoCalculatorAnimation />
           </div>
 
-          <div className="pt-8 w-full flex justify-center pb-2 max-w-md mx-auto">
+          <div className="pt-4 w-full flex justify-center pb-2 max-w-md mx-auto">
             <button
               onClick={() => navigate('/calculator')}
               className="inline-flex items-center gap-2 bg-electric-yellow text-black font-semibold px-6 py-3 rounded-lg hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20 w-full justify-center"
@@ -394,15 +392,15 @@ const App: React.FC = () => {
   );
 
   const HowToQDCSection = () => (
-    <div className="py-20 px-6 border-t border-zinc-200 bg-white">
-      <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+    <div className="pt-10 pb-16 px-6 border-t border-zinc-200 bg-white">
+      <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
         {/* Animation on Left */}
         <div className="relative flex flex-col justify-between items-center h-full order-2 lg:order-1">
           <div className="w-full">
             <DemoQDCAnimation />
           </div>
 
-          <div className="pt-8 w-full flex justify-center pb-2 max-w-md mx-auto">
+          <div className="pt-4 w-full flex justify-center pb-2 max-w-md mx-auto">
             <button
               onClick={() => navigate('/diagram-generator')}
               className="inline-flex items-center gap-2 bg-zinc-900 text-white font-semibold px-6 py-3 rounded-lg hover:bg-zinc-700 transition-colors shadow-lg shadow-zinc-500/20 w-full justify-center"
@@ -415,16 +413,16 @@ const App: React.FC = () => {
 
         {/* Text on Right */}
         <div className="flex flex-col order-1 lg:order-2">
-          <h2 className="text-3xl font-bold text-zinc-900 mb-6 text-center lg:text-left">
+          <h2 className="text-3xl font-bold text-zinc-900 mb-4 text-center lg:text-left">
             Dimensionador QDC <span className="text-yellow-600">Completo</span> e Automático
           </h2>
 
-          <p className="text-zinc-600 leading-relaxed mb-8 text-lg text-center lg:text-left">
+          <p className="text-zinc-600 leading-relaxed mb-6 text-[15px] text-center lg:text-left">
             Vai reformar ou construir? O <strong className="text-zinc-900">Dimensionador QDC</strong> gera a lista completa de materiais para o seu Quadro de Distribuição.
             Adicione todos os circuitos da casa e o sistema calcula automaticamente o Disjuntor Geral, IDR, DPS e balanceia as fases, entregando um relatório pronto para compra.
           </p>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider flex items-center gap-2">
               <span className="w-8 h-[1px] bg-yellow-500"></span>
               Passo a Passo Simplificado
@@ -449,13 +447,13 @@ const App: React.FC = () => {
                   desc: "Exporte uma imagem detalhada com o resumo de cabos (metros) e disjuntores para levar à loja."
                 }
               ].map((step, idx) => (
-                <li key={idx} className="flex gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-yellow-600 font-bold text-sm shadow-sm">
+                <li key={idx} className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-yellow-600 font-bold text-xs shadow-sm">
                     {idx + 1}
                   </div>
                   <div>
-                    <h4 className="text-zinc-900 font-medium text-sm">{step.title}</h4>
-                    <p className="text-zinc-600 text-sm leading-snug mt-1">{step.desc}</p>
+                    <h4 className="text-zinc-900 font-medium text-[15px]">{step.title}</h4>
+                    <p className="text-zinc-600 text-[13px] leading-snug">{step.desc}</p>
                   </div>
                 </li>
               ))}
@@ -466,54 +464,14 @@ const App: React.FC = () => {
     </div>
   );
 
-  const Hero = () => (
-    <div className="relative pt-32 pb-20 px-6 animate-fade-in overflow-hidden">
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-dark-border text-xs font-medium text-electric-yellow mb-8">
-          <span className="w-2 h-2 rounded-full bg-electric-yellow animate-pulse"></span>
-          Conformidade NBR 5410
-        </div>
 
-        <h1 className="text-4xl md:text-6xl font-semibold tracking-tight mb-6">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-400 to-white bg-[length:200%_auto] animate-shimmer">
-            Dimensionamento elétrico
-          </span>
-          <br className="hidden md:block" />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-500 via-zinc-200 to-zinc-500 bg-[length:200%_auto] animate-shimmer">
-            preciso e acessível.
-          </span>
-        </h1>
-
-        <p className="text-lg text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
-          Conjunto de ferramentas para <strong className="font-bold text-text-primary">Dimensionamento</strong> de <strong className="font-bold text-text-primary">Disjuntores</strong>, <strong className="font-bold text-text-primary">Condutores</strong> e <strong className="font-bold text-text-primary">Projetos Elétricos Profissionais</strong>.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button
-            onClick={() => navigate('/calculator')}
-            className="group bg-white text-black font-medium px-6 py-3 rounded-lg hover:bg-zinc-200 transition-all flex items-center gap-2"
-          >
-            <CalcIcon className="w-4 h-4" />
-            Abrir Calculadora
-          </button>
-
-          <button
-            onClick={() => navigate('/diagram-generator')}
-            className="group text-text-secondary hover:text-white font-medium px-6 py-3 flex items-center gap-2 transition-colors"
-          >
-            Dimensionador QDC <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-dark-bg selection:bg-electric-yellow selection:text-black">
       <div className="fixed inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none z-0"></div>
 
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-dark-bg/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex justify-between items-center">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex justify-between items-center relative">
           {/* ... header content ... */}
           <div
             className="flex items-center gap-3 cursor-pointer group shrink-0"
@@ -534,40 +492,39 @@ const App: React.FC = () => {
             </div>
           </div>
 
+          <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+            <NavItem target="/" label="Início" />
+
+            {/* Ferramentas Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setToolsOpen(!toolsOpen)}
+                className={`text-base font-medium transition-colors flex items-center gap-1 ${['/calculator', '/diagram-generator', '/download-app'].some(path => location.pathname.startsWith(path)) ? 'text-electric-yellow' : 'text-text-secondary hover:text-text-primary'}`}
+              >
+                Ferramentas <ChevronDown className={`w-4 h-4 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {toolsOpen && (
+                <div className="absolute top-full left-0 mt-2 w-56 bg-dark-surface border border-dark-border rounded-xl shadow-2xl py-2 animate-fade-in overflow-hidden">
+                  <button onClick={() => { navigate('/calculator'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
+                    <CalcIcon className="w-4 h-4 text-electric-yellow" /> Calculadora
+                  </button>
+                  <button onClick={() => { navigate('/diagram-generator'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
+                    <FileSpreadsheet className="w-4 h-4 text-electric-yellow" /> Dimensionador QDC
+                  </button>
+                  <div className="h-[1px] bg-dark-border my-1 mx-2"></div>
+                  <button onClick={() => { navigate('/download-app'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
+                    <Smartphone className="w-4 h-4 text-electric-yellow" /> Baixar App Android
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <NavItem target="/blog" label="Blog" />
+            <NavItem target="/who-we-are" label="Quem Somos" />
+          </nav>
+
           <div className="flex items-center gap-8">
-            <nav className="hidden lg:flex items-center gap-8">
-              <NavItem target="/" label="Início" />
-
-              {/* Ferramentas Dropdown */}
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setToolsOpen(!toolsOpen)}
-                  className={`text-base font-medium transition-colors flex items-center gap-1 ${['/calculator', '/diagram-generator', '/download-app'].some(path => location.pathname.startsWith(path)) ? 'text-electric-yellow' : 'text-text-secondary hover:text-text-primary'}`}
-                >
-                  Ferramentas <ChevronDown className={`w-4 h-4 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {toolsOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-dark-surface border border-dark-border rounded-xl shadow-2xl py-2 animate-fade-in overflow-hidden">
-                    <button onClick={() => { navigate('/calculator'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
-                      <CalcIcon className="w-4 h-4 text-electric-yellow" /> Calculadora
-                    </button>
-                    <button onClick={() => { navigate('/diagram-generator'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
-                      <FileSpreadsheet className="w-4 h-4 text-electric-yellow" /> Dimensionador QDC
-                    </button>
-                    <div className="h-[1px] bg-dark-border my-1 mx-2"></div>
-                    <button onClick={() => { navigate('/download-app'); setToolsOpen(false); }} className="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-white hover:bg-white/5 flex items-center gap-3">
-                      <Smartphone className="w-4 h-4 text-electric-yellow" /> Baixar App Android
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <NavItem target="/blog" label="Artigos" />
-              <NavItem target="/who-we-are" label="Quem Somos" />
-              <NavItem target="/contact" label="Contato" />
-            </nav>
-
             {/* Instagram Icon */}
             <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="hidden lg:block text-text-secondary hover:text-electric-yellow transition-colors">
               <Instagram className="w-5 h-5" />
@@ -617,7 +574,7 @@ const App: React.FC = () => {
                 )}
               </div>
 
-              <NavItem target="/blog" label="Artigos" className="text-lg" />
+              <NavItem target="/blog" label="Blog" className="text-lg" />
               <NavItem target="/who-we-are" label="Quem Somos" className="text-lg" />
               <NavItem target="/contact" label="Contato" className="text-lg" />
             </div>
@@ -629,7 +586,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={
             <>
-              <Hero />
+
               <HowToSection />
               <HowToQDCSection />
               <LatestArticlesSection />
@@ -638,7 +595,7 @@ const App: React.FC = () => {
           <Route path="/calculator" element={<Calculator />} />
           <Route path="/diagram-generator" element={<DiagramGenerator />} />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:id" element={<Blog />} />
+          <Route path="/:slug" element={<Blog />} />
           <Route path="/who-we-are" element={<WhoWeAre />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/download-app" element={
