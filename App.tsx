@@ -12,6 +12,7 @@ import { Contact } from './components/Contact';
 import { supabase } from './lib/supabaseClient';
 import { Analytics } from "@vercel/analytics/react"
 import { Footer } from './components/Footer';
+import { Helmet } from 'react-helmet-async';
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -468,6 +469,11 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-dark-bg selection:bg-electric-yellow selection:text-black">
+      <Helmet>
+        <title>Instalação Segura - Ferramentas Elétricas e Projetos</title>
+        <meta name="description" content="Calculadora elétrica, dimensionamento de cabos e disjuntores conforme NBR 5410. Ferramentas, blog e aplicativo para eletricistas." />
+        <link rel="canonical" href="https://instalacaosegura.com/" />
+      </Helmet>
       <div className="fixed inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none z-0"></div>
 
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-dark-bg/80 backdrop-blur-xl">
